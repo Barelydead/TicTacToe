@@ -4,7 +4,7 @@
         <p>Challange a foe!</p>
     </div>
     <div class="grid grid-cols-3 auto-rows-max">
-        <div v-for="(square, i) in board" :key="i" class="border border-solid text-5xl aspect-w-1 aspect-h-1 hover:bg-gray-200">
+        <div v-for="(square, i) in board" :key="i" class="border border-solid bolder-black text-5xl aspect-w-1 aspect-h-1 hover:bg-gray-200">
             <div @click="placeMarker(i)" class="flex justify-center items-center">{{ square ? square : '' }}</div>
         </div>
     </div>

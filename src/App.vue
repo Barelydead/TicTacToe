@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto mt-24 w-3/4">
+  <div class="main mx-auto p-4 md:p-8 lg:p-12">
     <TicTacToe />
   </div>
 </template>
