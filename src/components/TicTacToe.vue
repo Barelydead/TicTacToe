@@ -20,13 +20,20 @@
 </template>
 
 <script>
-export default {
+import { io } from "socket.io-client";
+const socket = io();
+
+export default  {
+    created() {
+        this.getRealtimeData()
+    },
     data() {
         return {
             board: [0, 0, 0, 0, 0, 0, 0, 0, 0],
             marker: 'X',
             winner: false,
             draw: false,
+            players: 0,
         }
     },
     methods: {
@@ -43,6 +50,8 @@ export default {
             this.checkWinner();
 
             if (!this.winner) this.marker = this.marker == 'X' ? 'O' : 'X';
+
+            socket.emit('sync-game', this.$data)
         },
         checkWinner() {
             // Check the rows
@@ -78,7 +87,19 @@ export default {
             this.winner = false;
             this.draw = false;
             this.marker = 'X';
-        }
+            this.players = 0;
+
+            socket.emit('sync-game', this.$data)
+        },
+        getRealtimeData() {
+            socket.on('sync-game', function(data) {
+                this.board = data.board;
+                this.winner = data.winner;
+                this.draw = data.draw;
+                this.marker = data.marker;
+                this.players = data.players;
+            }.bind(this))
+        },
     }
 }
 </script>

@@ -4,11 +4,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "rebuild": "vite build && node server.js"
   },
   "dependencies": {
     "@tailwindcss/aspect-ratio": "^0.2.0",
-    "vue": "^3.0.5"
+    "rollup": "^2.44.0",
+    "socket.io-client": "^4.0.1",
+    "vue": "^3.0.5",
+    "express": "^4.17.1",
+    "socket.io": "^4.0.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.2.1",
