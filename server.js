@@ -1,24 +1,29 @@
-const app = require('express')();
-const express = require('express');
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const path = require('path');
+const io = require('socket.io')();
 
-app.use('/', express.static('dist'));
+let numberOfPlayers = 0;
 
-app.get('*', (req,res,next) => {
-    const indexFile = path.resolve(__dirname + '/dist/index.html');
-    res.sendFile(indexFile);
-});
+io.on('connection', socket => {
+  console.log(`connect: ${socket.id}`);
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  
   socket.on('sync-game', (data) => {
     io.emit('sync-game', data);
   })
+
+  socket.on('new-player', (data) => {
+    numberOfPlayers++;
+    socket.emit('new-player', {
+      id: numberOfPlayers,
+      marker: numberOfPlayers % 2 == 0 ? 'X' : 'O',
+    })
+  })
+
+  socket.on('disconnect', () => {
+    console.log(`disconnect: ${socket.id}`);
+  });
 });
 
-http.listen(1337, () => {
-  console.log('listening on *:1337');
+io.listen(1337, {
+  cors: {
+    origin: ["http://localhost:3000"]
+  }
 });

@@ -2,6 +2,9 @@
     <div class="mb-4">
         <h1 class="text-3xl text-black">Tic Tac Toe</h1>
         <p>Challange a foe!</p>
+        <div v-if="yourMarker" class="mt-4">
+            <p>You are playing with marker: {{ yourMarker }}</p>
+        </div>
     </div>
     <div class="grid grid-cols-3 auto-rows-max">
         <div v-for="(square, i) in board" :key="i" class="border border-solid bolder-black text-5xl aspect-w-1 aspect-h-1 hover:bg-gray-200">
@@ -14,18 +17,22 @@
     <div v-if="draw">
         <p>This game was a draw</p>
     </div>
-    <div v-if="winner || draw">
+    <div>
         <button @click="resetBoard">Reset the board</button>
     </div>
 </template>
 
 <script>
 import { io } from "socket.io-client";
-const socket = io();
+const socket = io('http://localhost:1337');
 
 export default  {
     created() {
+        socket.emit('new-player')
         this.getRealtimeData()
+    },
+    unmounted() {
+        socket.emit('disconnect')
     },
     data() {
         return {
@@ -33,11 +40,15 @@ export default  {
             marker: 'X',
             winner: false,
             draw: false,
-            players: 0,
+            yourMarker: false,
         }
     },
     methods: {
         placeMarker(index) {
+            if (this.marker !== this.yourMarker) {
+                return;
+            }
+
             if (this.winner) {
                 return;
             }
@@ -92,12 +103,17 @@ export default  {
             socket.emit('sync-game', this.$data)
         },
         getRealtimeData() {
+            // Sync the game state.
             socket.on('sync-game', function(data) {
                 this.board = data.board;
                 this.winner = data.winner;
                 this.draw = data.draw;
                 this.marker = data.marker;
                 this.players = data.players;
+            }.bind(this))
+
+            socket.on('new-player', function(data) {
+                this.yourMarker = data.marker
             }.bind(this))
         },
     }
